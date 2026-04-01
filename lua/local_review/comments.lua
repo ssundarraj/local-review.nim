@@ -8,8 +8,7 @@ local function now()
 end
 
 local function hrtime()
-  local uv = vim.uv or vim.loop
-  return uv.hrtime()
+  return vim.uv.hrtime()
 end
 
 local function notify(message, level)
