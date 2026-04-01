@@ -44,7 +44,7 @@ function M.setup(opts)
 
   if not state.configured then
     command("LocalReviewComment", function()
-      require("local_review.comments").prompt_for_current_line()
+      require("local_review.ui").open_current_line()
     end, {})
 
     command("LocalReviewDelete", function()
@@ -52,7 +52,7 @@ function M.setup(opts)
     end, {})
 
     command("LocalReviewShow", function()
-      require("local_review.comments").show_current_line()
+      require("local_review.ui").open_current_line()
     end, {})
 
     command("LocalReviewNext", function()

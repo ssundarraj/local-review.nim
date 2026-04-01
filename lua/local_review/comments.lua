@@ -125,6 +125,36 @@ local function find_current_comment()
   }
 end
 
+local function find_line_comment(bufnr, line)
+  local ctx, err = context.comment_context(bufnr)
+  if not ctx then
+    return nil, err
+  end
+
+  local repo_state = {
+    repo_root = ctx.repo_root,
+    data = storage.load_repo(ctx.repo_root),
+  }
+
+  for index, comment in ipairs(repo_state.data.comments) do
+    if comment.relative_path == ctx.relative_path and comment.line == line then
+      return {
+        comment = comment,
+        index = index,
+        ctx = ctx,
+        repo_state = repo_state,
+      }
+    end
+  end
+
+  return {
+    comment = nil,
+    index = nil,
+    ctx = ctx,
+    repo_state = repo_state,
+  }
+end
+
 function M.list_repo_comments(repo_root)
   local data = storage.load_repo(repo_root)
   table.sort(data.comments, comment_sorter)
@@ -145,6 +175,68 @@ function M.comments_for_buffer(bufnr)
     end
   end
   return matches
+end
+
+function M.get_line_state(bufnr, line)
+  local result, err = find_line_comment(bufnr or 0, line)
+  if not result then
+    notify(err, vim.log.levels.WARN)
+    return nil
+  end
+
+  return result
+end
+
+function M.upsert_line_comment(line_state, body)
+  local trimmed = vim.trim(body or "")
+  if trimmed == "" then
+    return nil, "Comment cannot be empty."
+  end
+
+  local _, updated = upsert_comment(line_state.repo_state, line_state.ctx, line_state.comment and line_state.comment.line or line_state.ctx.line or current_line(), trimmed)
+  storage.save_repo(line_state.ctx.repo_root, line_state.repo_state.data)
+  refresh_repo_buffers(line_state.ctx.repo_root)
+  return updated and "updated" or "created"
+end
+
+function M.set_line_comment(bufnr, line, body)
+  local line_state = M.get_line_state(bufnr, line)
+  if not line_state then
+    return nil, "Unable to resolve comment target."
+  end
+
+  local trimmed = vim.trim(body or "")
+  if trimmed == "" then
+    if line_state.index ~= nil then
+      table.remove(line_state.repo_state.data.comments, line_state.index)
+      storage.save_repo(line_state.ctx.repo_root, line_state.repo_state.data)
+      refresh_repo_buffers(line_state.ctx.repo_root)
+      return "deleted"
+    end
+
+    return "noop"
+  end
+
+  local _, updated = upsert_comment(line_state.repo_state, line_state.ctx, line, trimmed)
+  storage.save_repo(line_state.ctx.repo_root, line_state.repo_state.data)
+  refresh_repo_buffers(line_state.ctx.repo_root)
+  return updated and "updated" or "created"
+end
+
+function M.delete_line_comment(bufnr, line)
+  local line_state = M.get_line_state(bufnr, line)
+  if not line_state then
+    return nil, "Unable to resolve comment target."
+  end
+
+  if line_state.index == nil then
+    return "missing"
+  end
+
+  table.remove(line_state.repo_state.data.comments, line_state.index)
+  storage.save_repo(line_state.ctx.repo_root, line_state.repo_state.data)
+  refresh_repo_buffers(line_state.ctx.repo_root)
+  return "deleted"
 end
 
 function M.prompt_for_current_line()

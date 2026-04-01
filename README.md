@@ -4,8 +4,8 @@ Local review comments for Neovim, exported as plain-text feedback for coding age
 
 ## Features
 
-- Add or edit a review comment for the current line
-- Delete or show the current line's comment
+- Open an editable review comment float for the current line
+- Delete or reopen the current line's comment
 - Navigate to the next or previous commented line in the current buffer
 - Persist comments per Git repository under Neovim state
 - Show commented lines with signs
