@@ -38,7 +38,7 @@ Use your preferred plugin manager. Example with `lazy.nvim`:
 require("local_review").setup({
   sign_name = "LocalReviewComment",
   sign_text = "●",
-  storage_dir = vim.fn.stdpath("state") .. "/agent-review",
+  storage_dir = vim.fn.stdpath("state") .. "/local-review",
   keymaps = {
     comment = "<leader>rc",
     delete = "<leader>rd",
