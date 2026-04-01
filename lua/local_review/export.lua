@@ -2,6 +2,8 @@ local M = {}
 
 local context = require("local_review.context")
 local comments = require("local_review.comments")
+local export_indent_width = 3
+local export_indent = string.rep(" ", export_indent_width)
 
 local function notify(message, level)
   vim.notify(message, level or vim.log.levels.INFO)
@@ -22,7 +24,8 @@ local function export_lines(repo_root)
 
   for index, comment in ipairs(repo_comments) do
     lines[#lines + 1] = string.format("%d. %s:%d", index, comment.relative_path, comment.line)
-    lines[#lines + 1] = string.format("   %s", comment.body)
+    -- Indent every rendered line so multi-line comments stay aligned
+    lines[#lines + 1] = export_indent .. comment.body:gsub("\n", "\n" .. export_indent)
     lines[#lines + 1] = ""
   end
 
