@@ -29,6 +29,10 @@ local function export_lines(repo_root)
 	return lines
 end
 
+function M.repo_export_text(repo_root)
+	return table.concat(export_lines(repo_root), "\n")
+end
+
 function M.open_repo_export()
 	local repo_root, err = context.repo_root()
 	if not repo_root then
@@ -36,16 +40,7 @@ function M.open_repo_export()
 		return
 	end
 
-	local lines = export_lines(repo_root)
-	local buf = vim.api.nvim_create_buf(true, true)
-	vim.api.nvim_buf_set_name(buf, "local-review://export")
-	vim.api.nvim_set_current_buf(buf)
-	vim.bo[buf].buftype = "nofile"
-	vim.bo[buf].bufhidden = "wipe"
-	vim.bo[buf].swapfile = false
-	vim.bo[buf].modifiable = true
-	vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
-	vim.bo[buf].modifiable = false
+	vim.api.nvim_out_write(M.repo_export_text(repo_root) .. "\n")
 end
 
 return M
