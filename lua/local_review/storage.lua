@@ -38,7 +38,11 @@ end
 function M.save_repo(repo_root, data)
   local path = M.repo_file(repo_root)
   ensure_dir(vim.fn.fnamemodify(path, ":h"))
-  vim.fn.writefile({ vim.json.encode(data) }, path)
+  if vim.fn.writefile({ vim.json.encode(data) }, path) ~= 0 then
+    return nil, string.format("Failed to save review comments to %s.", path)
+  end
+
+  return true
 end
 
 function M.delete_repo(repo_root)

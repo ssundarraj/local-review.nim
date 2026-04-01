@@ -43,6 +43,16 @@ local function refresh_repo_buffers(repo_root)
   end
 end
 
+local function persist_repo_state(repo_root, data)
+  local ok, err = storage.save_repo(repo_root, data)
+  if not ok then
+    return nil, err
+  end
+
+  refresh_repo_buffers(repo_root)
+  return true
+end
+
 local function comment_sorter(a, b)
   if a.relative_path ~= b.relative_path then
     return a.relative_path < b.relative_path
@@ -198,8 +208,10 @@ function M.upsert_line_comment(line_state, body)
     line_state.comment and line_state.comment.line or line_state.ctx.line or current_line(),
     trimmed
   )
-  storage.save_repo(line_state.ctx.repo_root, line_state.repo_state.data)
-  refresh_repo_buffers(line_state.ctx.repo_root)
+  local ok, err = persist_repo_state(line_state.ctx.repo_root, line_state.repo_state.data)
+  if not ok then
+    return nil, err
+  end
   return updated and "updated" or "created"
 end
 
@@ -213,8 +225,10 @@ function M.set_line_comment(bufnr, line, body)
   if trimmed == "" then
     if line_state.index ~= nil then
       table.remove(line_state.repo_state.data.comments, line_state.index)
-      storage.save_repo(line_state.ctx.repo_root, line_state.repo_state.data)
-      refresh_repo_buffers(line_state.ctx.repo_root)
+      local ok, err = persist_repo_state(line_state.ctx.repo_root, line_state.repo_state.data)
+      if not ok then
+        return nil, err
+      end
       return "deleted"
     end
 
@@ -222,8 +236,10 @@ function M.set_line_comment(bufnr, line, body)
   end
 
   local _, updated = upsert_comment(line_state.repo_state, line_state.ctx, line, trimmed)
-  storage.save_repo(line_state.ctx.repo_root, line_state.repo_state.data)
-  refresh_repo_buffers(line_state.ctx.repo_root)
+  local ok, err = persist_repo_state(line_state.ctx.repo_root, line_state.repo_state.data)
+  if not ok then
+    return nil, err
+  end
   return updated and "updated" or "created"
 end
 
@@ -238,8 +254,10 @@ function M.delete_line_comment(bufnr, line)
   end
 
   table.remove(line_state.repo_state.data.comments, line_state.index)
-  storage.save_repo(line_state.ctx.repo_root, line_state.repo_state.data)
-  refresh_repo_buffers(line_state.ctx.repo_root)
+  local ok, err = persist_repo_state(line_state.ctx.repo_root, line_state.repo_state.data)
+  if not ok then
+    return nil, err
+  end
   return "deleted"
 end
 
@@ -268,8 +286,11 @@ function M.prompt_for_current_line()
     end
 
     local _, updated = upsert_comment(result.repo_state, result.ctx, line, trimmed)
-    storage.save_repo(result.ctx.repo_root, result.repo_state.data)
-    refresh_repo_buffers(result.ctx.repo_root)
+    local ok, err = persist_repo_state(result.ctx.repo_root, result.repo_state.data)
+    if not ok then
+      notify(err, vim.log.levels.ERROR)
+      return
+    end
     notify(updated and "Review comment updated." or "Review comment added.")
   end)
 end
@@ -286,8 +307,11 @@ function M.delete_current_line()
   end
 
   table.remove(result.repo_state.data.comments, result.index)
-  storage.save_repo(result.ctx.repo_root, result.repo_state.data)
-  refresh_repo_buffers(result.ctx.repo_root)
+  local ok, err = persist_repo_state(result.ctx.repo_root, result.repo_state.data)
+  if not ok then
+    notify(err, vim.log.levels.ERROR)
+    return
+  end
   notify("Review comment deleted.")
 end
 
@@ -335,9 +359,14 @@ function M.clear_repo()
   local deleted = storage.delete_repo(repo_state.repo_root)
   if not deleted then
     -- Fallback, save empty comments
-    storage.save_repo(repo_state.repo_root, repo_state.data)
+    local ok, err = persist_repo_state(repo_state.repo_root, repo_state.data)
+    if not ok then
+      notify(err, vim.log.levels.ERROR)
+      return
+    end
+  else
+    refresh_repo_buffers(repo_state.repo_root)
   end
-  refresh_repo_buffers(repo_state.repo_root)
   notify("Cleared review comments for current repo.")
 end
 
