@@ -43,7 +43,7 @@ function M.open_repo_export()
     return
   end
 
-  vim.api.nvim_out_write(M.repo_export_text(repo_root) .. "\n")
+  io.write(M.repo_export_text(repo_root) .. "\n")
 end
 
 return M

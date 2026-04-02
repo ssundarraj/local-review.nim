@@ -83,7 +83,7 @@ local function previewer(previewers)
       if target_line then
         local max_line = vim.api.nvim_buf_line_count(self.state.bufnr)
         local clamped_line = math.max(1, math.min(target_line, max_line))
-        vim.api.nvim_buf_add_highlight(self.state.bufnr, -1, "Visual", clamped_line - 1, 0, -1)
+        vim.hl.range(self.state.bufnr, -1, "Visual", { clamped_line - 1, 0 }, { clamped_line - 1, -1 })
         pcall(vim.api.nvim_win_set_cursor, status.preview_win, { clamped_line, 0 })
         pcall(vim.api.nvim_win_call, status.preview_win, function()
           vim.cmd("normal! zz")

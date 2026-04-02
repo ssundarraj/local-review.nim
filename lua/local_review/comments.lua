@@ -1,5 +1,17 @@
 local M = {}
 
+---@class LocalReviewComment
+---@field id string
+---@field repo_root string
+---@field absolute_path string
+---@field relative_path string
+---@field line integer
+---@field body string
+---@field created_at string
+---@field updated_at string
+---@field source_kind string
+---@field source_meta table
+
 local context = require("local_review.context")
 local storage = require("local_review.storage")
 
@@ -8,6 +20,7 @@ local function now()
 end
 
 local function hrtime()
+  ---@diagnostic disable-next-line: undefined-field
   return vim.uv.hrtime()
 end
 
@@ -63,6 +76,7 @@ local function comment_sorter(a, b)
   return (a.created_at or "") < (b.created_at or "")
 end
 
+---@return LocalReviewComment, boolean
 local function upsert_comment(repo_state, ctx, line, body)
   local comments = repo_state.data.comments
   local existing
@@ -118,6 +132,7 @@ local function find_current_comment()
   for index, comment in ipairs(repo_state.data.comments) do
     if comment.relative_path == ctx.relative_path and comment.line == line then
       return {
+        ---@type LocalReviewComment
         comment = comment,
         index = index,
         ctx = ctx,
@@ -127,6 +142,7 @@ local function find_current_comment()
   end
 
   return {
+    ---@type LocalReviewComment?
     comment = nil,
     index = nil,
     ctx = ctx,
@@ -157,6 +173,7 @@ local function find_line_comment(bufnr, line)
   end
 
   return {
+    ---@type LocalReviewComment?
     comment = nil,
     index = nil,
     ctx = ctx,

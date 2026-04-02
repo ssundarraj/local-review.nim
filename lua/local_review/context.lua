@@ -15,7 +15,7 @@ end
 function M.repo_root(path)
   local target = path or vim.api.nvim_buf_get_name(0)
   if target == nil or target == "" then
-    target = vim.uv.cwd()
+    target = vim.fn.getcwd()
   end
 
   local directory = vim.fn.fnamemodify(target, ":p:h")
