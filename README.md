@@ -35,6 +35,8 @@ Use your preferred plugin manager. Example with `lazy.nvim`:
 }
 ```
 
+Copy or symlink the skill into your preferred harness's skills directory.
+
 ### Telescope
 
 If you use Telescope, you can open a picker for all review comments in the current repo:
@@ -56,5 +58,7 @@ end, { desc = "Local Review Picker" })
 
 ## Notes
 
+- Comments are scoped to each repo.
+  file changes under the hood.
 - This was largely vibe-coded. There is likely some poor code and you may find bugs.
 - Issues/PRs welcome but please open an issue before making a large change.
