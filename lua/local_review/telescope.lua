@@ -40,6 +40,13 @@ local function comment_summary(body)
   return vim.trim((body or ""):gsub("%s+", " "))
 end
 
+local function status_summary(comment)
+  if comment.stale then
+    return "[stale] " .. comment_summary(comment.body)
+  end
+  return comment_summary(comment.body)
+end
+
 local function open_comment(comment)
   if vim.fn.filereadable(comment.absolute_path) == 0 then
     notify(string.format("Comment file no longer exists: %s", comment.absolute_path), vim.log.levels.WARN)
@@ -47,7 +54,12 @@ local function open_comment(comment)
   end
 
   vim.cmd.edit(vim.fn.fnameescape(comment.absolute_path))
-  vim.api.nvim_win_set_cursor(0, { comment.line, 0 })
+  local max_line = math.max(vim.api.nvim_buf_line_count(0), 1)
+  local line = math.max(1, math.min(comment.line or 1, max_line))
+  vim.api.nvim_win_set_cursor(0, { line, 0 })
+  if comment.stale then
+    notify("This review comment is stale and may no longer point at the original code.", vim.log.levels.WARN)
+  end
 end
 
 local function preview_lines(comment)
@@ -121,7 +133,7 @@ function M.comments(opts)
       finder = modules.finders.new_table({
         results = repo_comments,
         entry_maker = function(comment)
-          local summary = comment_summary(comment.body)
+          local summary = status_summary(comment)
           return {
             value = comment,
             ordinal = table.concat({
@@ -133,7 +145,7 @@ function M.comments(opts)
               return displayer({
                 entry.value.relative_path,
                 tostring(entry.value.line),
-                comment_summary(entry.value.body),
+                status_summary(entry.value),
               })
             end,
           }

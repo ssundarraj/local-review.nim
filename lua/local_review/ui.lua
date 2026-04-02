@@ -285,6 +285,10 @@ function M.open_current_line()
   end
 
   local lines = body_lines(line_state.comment and line_state.comment.body or "")
+  local title = " Review Comment "
+  if line_state.comment and line_state.comment.stale then
+    title = " Review Comment [stale] "
+  end
   local size = inline_dimensions(lines, source_winid, state.anchor_row)
   local bufnr = vim.api.nvim_create_buf(false, true)
 
@@ -317,7 +321,7 @@ function M.open_current_line()
     height = size.height,
     style = "minimal",
     border = "rounded",
-    title = " Review Comment ",
+    title = title,
     title_pos = "left",
     noautocmd = true,
   })
@@ -334,6 +338,9 @@ function M.open_current_line()
   set_editor_keymaps(bufnr)
   attach_editor_autocmds(bufnr, winid)
   update_placeholder(bufnr)
+  if line_state.comment and line_state.comment.stale then
+    notify("This review comment is stale and may no longer point at the original code.", vim.log.levels.WARN)
+  end
 end
 
 return M

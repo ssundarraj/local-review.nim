@@ -23,7 +23,8 @@ local function export_lines(repo_root)
   }
 
   for index, comment in ipairs(repo_comments) do
-    lines[#lines + 1] = string.format("%d. %s:%d", index, comment.relative_path, comment.line)
+    local stale_suffix = comment.stale and " [stale]" or ""
+    lines[#lines + 1] = string.format("%d. %s:%d%s", index, comment.relative_path, comment.line, stale_suffix)
     -- Indent every rendered line so multi-line comments stay aligned
     lines[#lines + 1] = export_indent .. comment.body:gsub("\n", "\n" .. export_indent)
     lines[#lines + 1] = ""
