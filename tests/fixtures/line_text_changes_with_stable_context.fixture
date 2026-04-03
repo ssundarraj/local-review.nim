@@ -1,0 +1,15 @@
+--- file_before
+alpha
+before
+target()
+after
+omega
+--- file_after
+alpha
+before
+target_renamed()
+after
+omega
+--- assertions
+before_line: 3
+resolved_after_line: 3

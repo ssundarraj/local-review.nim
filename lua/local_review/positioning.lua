@@ -86,6 +86,17 @@ local function candidate_lines(lines, target, start_line, end_line)
   return matches
 end
 
+---@param start_line integer
+---@param end_line integer
+---@return integer[]
+local function line_range(start_line, end_line)
+  local matches = {}
+  for line = start_line, end_line do
+    matches[#matches + 1] = line
+  end
+  return matches
+end
+
 ---@param anchor LineAnchor
 ---@param lines string[]
 ---@param matches integer[]
@@ -190,7 +201,18 @@ function M.resolve(anchor, lines)
 
   -- Fallback to searching entire file
   matches = candidate_lines(lines, target, 1, line_count)
-  return select_candidate(anchor, lines, matches)
+  resolved = select_candidate(anchor, lines, matches)
+  if resolved then
+    return resolved
+  end
+
+  -- When the target line text changes, fall back to context-only matching.
+  resolved = select_candidate(anchor, lines, line_range(start_line, end_line))
+  if resolved then
+    return resolved
+  end
+
+  return select_candidate(anchor, lines, line_range(1, line_count))
 end
 
 return M
