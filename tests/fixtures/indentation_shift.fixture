@@ -1,0 +1,25 @@
+--- file_before
+local function render(items, lines)
+  if #items == 0 then
+    return nil
+  end
+
+  for _, item in ipairs(items) do
+    table.insert(lines, item.name)
+  end
+end
+--- file_after
+local function render(items, lines)
+  if #items == 0 then
+    return nil
+  end
+
+  if true then
+    for _, item in ipairs(items) do
+      table.insert(lines, item.name)
+    end
+  end
+end
+--- assertions
+before_line: 7
+resolved_after_line: 8

@@ -1,0 +1,45 @@
+--- file_before
+local function dispatch(kind, bufnr, line)
+  if kind == "comment" then
+    return open_comment(bufnr, line)
+  end
+
+  if kind == "jump" then
+    return open_jump(bufnr, line)
+  end
+end
+--- file_after
+local function dispatch(kind, bufnr, line)
+  if kind == "comment" then
+    return open_comment(bufnr, line)
+  end
+
+  local pad1 = 1
+  local pad2 = 2
+  local pad3 = 3
+  local pad4 = 4
+  local pad5 = 5
+  local pad6 = 6
+  local pad7 = 7
+  local pad8 = 8
+  local pad9 = 9
+  local pad10 = 10
+  local pad11 = 11
+  local pad12 = 12
+  local pad13 = 13
+  local pad14 = 14
+  local pad15 = 15
+  local pad16 = 16
+  local pad17 = 17
+  local pad18 = 18
+  local pad19 = 19
+  local pad20 = 20
+  local pad21 = 21
+
+  if kind == "jump" then
+    return open_jump(bufnr, line)
+  end
+end
+--- assertions
+before_line: 7
+resolved_after_line: 29

@@ -1,0 +1,32 @@
+--- file_before
+local function build(value, fallback)
+  local result = normalize(value)
+
+  if result.ok then
+    return result
+  end
+
+  local fallback_result = normalize(fallback)
+
+  if fallback_result.ok then
+    return fallback_result
+  end
+end
+--- file_after
+local function build(value, fallback)
+  local result = normalize(value)
+
+  if result.ok then
+    return result
+  end
+
+  local fallback_result = normalize(fallback)
+  local ready = fallback_result.ok
+
+  if ready then
+    return fallback_result
+  end
+end
+--- assertions
+before_line: 11
+resolved_after_line: 12

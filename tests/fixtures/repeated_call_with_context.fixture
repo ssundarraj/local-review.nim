@@ -1,0 +1,32 @@
+--- file_before
+local function sync(items)
+  for _, item in ipairs(items) do
+    if item.valid then
+      save(item)
+    end
+  end
+
+  for _, item in ipairs(items) do
+    if item.stale then
+      save(item)
+    end
+  end
+end
+--- file_after
+local function sync(items)
+  for _, item in ipairs(items) do
+    if item.valid then
+      log(item)
+      save(item)
+    end
+  end
+
+  for _, item in ipairs(items) do
+    if item.stale then
+      save(item)
+    end
+  end
+end
+--- assertions
+before_line: 10
+resolved_after_line: 11
