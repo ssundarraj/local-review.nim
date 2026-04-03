@@ -34,3 +34,6 @@ responding to. This can be by listing all comments in a numbered list or by coll
 the comments with your response. Prefer listing all the comments if there are only a few 
 comments.
 
+Comments can be stale. If they are marked stale, confirm with the user before addressing
+them.
+
