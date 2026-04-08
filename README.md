@@ -4,11 +4,19 @@ Neovim plugin for local code review, built for use with coding agents.
 
 ## Features
 
+<details>
+  <summary>Demo video</summary>
+
+  [Video Demo](https://github.com/user-attachments/assets/7c2d1fa2-9d4d-4660-bd1d-c044b9a86279)
+
+</details>
+
+
 Add, edit and delete comments on lines of code. Use your existing diff-viewer for diffs.
 
 ![Comment UI](./screenshots/comment_ui.png)
 
-Ships with a [skill](./skills/local-review/SKILL.md) that tells agents how to read comments.
+Use the included [skill](./skills/local-review/SKILL.md) that tells agents how to read comments.
 
 ![Review Skill](./screenshots/skill_claude.png)
 
