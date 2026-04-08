@@ -55,7 +55,6 @@ end, { desc = "Local Review Picker" })
 - `:LocalReviewPrev` jump to the previous review comment in the current file
 - `:LocalReviewExport [path]` print review comments for a path in a copy/paste-friendly format. If omitted, it uses the current repo root when available, otherwise `cwd`.
 - `:LocalReviewClear [path]` delete stored review comments for a path. If omitted, it uses the current repo root when available, otherwise `cwd`.
-- `:LocalReviewClearRepo [path]` compatibility alias for `:LocalReviewClear`.
 
 ## Notes
 

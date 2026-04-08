@@ -66,10 +66,6 @@ function M.setup(opts)
       require("local_review.comments").clear_path(command_opts.args)
     end, { nargs = "?" })
 
-    command("LocalReviewClearRepo", function(command_opts)
-      require("local_review.comments").clear_path(command_opts.args)
-    end, { nargs = "?" })
-
     vim.api.nvim_create_autocmd({ "BufEnter", "BufReadPost", "BufWritePost", "FileChangedShellPost" }, {
       group = vim.api.nvim_create_augroup("local-review-refresh", { clear = true }),
       callback = function(event)
