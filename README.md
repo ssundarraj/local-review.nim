@@ -47,6 +47,8 @@ Use your preferred plugin manager. Example with `lazy.nvim`:
 }
 ```
 
+### Skill
+
 Copy or symlink the skill into your preferred harness's skills directory.
 
 ### Telescope
