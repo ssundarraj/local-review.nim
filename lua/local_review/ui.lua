@@ -39,6 +39,15 @@ local function body_lines(body)
   return vim.split(text, "\n", { plain = true })
 end
 
+local function editor_buffer_name(source_bufnr, source_line)
+  local source_name = vim.api.nvim_buf_get_name(source_bufnr)
+  if source_name == "" then
+    source_name = string.format("buffer-%d", source_bufnr)
+  end
+
+  return string.format("local-review://comment/%s:%d", source_name, source_line)
+end
+
 local function current_body()
   if not is_valid_buffer(state.editor_bufnr) then
     return ""
@@ -238,6 +247,16 @@ local function attach_editor_autocmds(bufnr, winid)
     end,
   })
 
+  vim.api.nvim_create_autocmd("BufWriteCmd", {
+    group = group,
+    buffer = bufnr,
+    callback = function()
+      persist()
+      update_placeholder(bufnr)
+      update_layout()
+    end,
+  })
+
   vim.api.nvim_create_autocmd("WinClosed", {
     group = group,
     callback = function(event)
@@ -291,11 +310,12 @@ function M.open_current_line()
   local size = inline_dimensions(lines, source_winid, state.anchor_row)
   local bufnr = vim.api.nvim_create_buf(false, true)
 
-  vim.bo[bufnr].buftype = "nofile"
+  vim.bo[bufnr].buftype = "acwrite"
   vim.bo[bufnr].bufhidden = "wipe"
   vim.bo[bufnr].swapfile = false
   vim.bo[bufnr].modifiable = true
   vim.bo[bufnr].filetype = "markdown"
+  vim.api.nvim_buf_set_name(bufnr, editor_buffer_name(source_bufnr, source_line))
 
   vim.api.nvim_buf_set_lines(bufnr, 0, -1, false, lines)
 
