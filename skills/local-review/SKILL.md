@@ -16,16 +16,18 @@ installed in the user's normal Neovim setup.
 ## Read comments
 
 ```sh
-nvim --headless '+LocalReviewExport [path]' \
-  +qa
+nvim --headless '+LocalReviewExport [path]' +qa
 ```
+
+Omit path unless the user asks for a specific path.
 
 ## Clear comments
 
 ```sh
-nvim --headless '+LocalReviewClear [path]' \
-  +qa
+nvim --headless '+LocalReviewClear [path]' +qa
 ```
+
+Omit path unless the user asks for a specific path.
 
 ## Usage
 
