@@ -1,0 +1,62 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: leafo/gh-actions-lua@v10
+        with:
+          luaVersion: "5.1"
+
+      - uses: leafo/gh-actions-luarocks@v4
+
+      - name: Install busted
+        run: luarocks install busted
+
+      - name: Run tests
+        run: ./scripts/test.sh
+
+  typecheck:
+    name: Typecheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Neovim
+        uses: rhysd/action-setup-vim@v1
+        with:
+          neovim: true
+          version: stable
+
+      - name: Install lua-language-server
+        run: |
+          set -eu
+          version=$(curl -sL https://api.github.com/repos/LuaLS/lua-language-server/releases/latest | jq -r .tag_name)
+          mkdir -p /tmp/lua-language-server
+          curl -L "https://github.com/LuaLS/lua-language-server/releases/download/${version}/lua-language-server-${version}-linux-x64.tar.gz" | tar xz -C /tmp/lua-language-server
+          echo "/tmp/lua-language-server/bin" >> "$GITHUB_PATH"
+
+      - name: Run typecheck
+        env:
+          LUALS_BIN: /tmp/lua-language-server/bin/lua-language-server
+        run: ./scripts/typecheck.sh
+
+  format:
+    name: Format
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: JohnnyMorganz/stylua-action@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          version: latest
+          args: --check lua/ tests/
