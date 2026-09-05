@@ -206,7 +206,7 @@ function M.save_scope(scope_root, data, opts)
   release_lock(fd, lock_or_err)
 
   if not ok then
-    return nil, result
+    return nil, tostring(result)
   end
   return result, err
 end
