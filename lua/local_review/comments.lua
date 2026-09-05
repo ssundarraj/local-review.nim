@@ -71,8 +71,8 @@ local function refresh_scope_buffers(scope_root)
   end
 end
 
-local function persist_scope_state(scope_root, data)
-  local ok, err = storage.save_scope(scope_root, data)
+local function persist_scope_state(scope_root, data, opts)
+  local ok, err = storage.save_scope(scope_root, data, opts)
   if not ok then
     return nil, err
   end
@@ -296,6 +296,7 @@ local function remove_matching_comments(target_path, kind)
 
   for _, scope in ipairs(storage.list_scopes()) do
     local kept = {}
+    local remove_ids = {}
     local changed = false
     for _, comment in ipairs(scope.data.comments or {}) do
       local matches = false
@@ -307,6 +308,7 @@ local function remove_matching_comments(target_path, kind)
 
       if matches then
         changed = true
+        remove_ids[comment.id] = true
       else
         table.insert(kept, comment)
       end
@@ -318,6 +320,7 @@ local function remove_matching_comments(target_path, kind)
         data = {
           scope_root = scope.scope_root,
           comments = kept,
+          removed_ids = remove_ids,
         },
       }
     end
@@ -407,8 +410,10 @@ function M.set_line_comment(bufnr, line, body)
   local trimmed = vim.trim(body or "")
   if trimmed == "" then
     if line_state.index ~= nil then
-      table.remove(line_state.scope_state.data.comments, line_state.index)
-      local ok, err = persist_scope_state(line_state.ctx.scope_root, line_state.scope_state.data)
+      local removed = table.remove(line_state.scope_state.data.comments, line_state.index)
+      local ok, err = persist_scope_state(line_state.ctx.scope_root, line_state.scope_state.data, {
+        remove_ids = { [removed.id] = true },
+      })
       if not ok then
         return nil, err
       end
@@ -436,8 +441,10 @@ function M.delete_line_comment(bufnr, line)
     return "missing"
   end
 
-  table.remove(line_state.scope_state.data.comments, line_state.index)
-  local ok, err = persist_scope_state(line_state.ctx.scope_root, line_state.scope_state.data)
+  local removed = table.remove(line_state.scope_state.data.comments, line_state.index)
+  local ok, err = persist_scope_state(line_state.ctx.scope_root, line_state.scope_state.data, {
+    remove_ids = { [removed.id] = true },
+  })
   if not ok then
     return nil, err
   end
@@ -498,8 +505,10 @@ function M.delete_current_line()
     return
   end
 
-  table.remove(result.scope_state.data.comments, result.index)
-  local ok, err = persist_scope_state(result.ctx.scope_root, result.scope_state.data)
+  local removed = table.remove(result.scope_state.data.comments, result.index)
+  local ok, err = persist_scope_state(result.ctx.scope_root, result.scope_state.data, {
+    remove_ids = { [removed.id] = true },
+  })
   if not ok then
     vim.notify(err or "Failed to delete the review comment.", vim.log.levels.ERROR)
     return
@@ -563,22 +572,10 @@ function M.clear_path(path, opts)
 
   local changed_scopes = remove_matching_comments(target_path, kind)
   for _, scope in ipairs(changed_scopes) do
-    if #scope.data.comments == 0 then
-      if not storage.delete_scope(scope.scope_root) then
-        local ok, err = persist_scope_state(scope.scope_root, scope.data)
-        if not ok then
-          vim.notify(err or "Failed to clear review comments.", vim.log.levels.ERROR)
-          return
-        end
-      else
-        refresh_scope_buffers(scope.scope_root)
-      end
-    else
-      local ok, err = persist_scope_state(scope.scope_root, scope.data)
-      if not ok then
-        vim.notify(err or "Failed to clear review comments.", vim.log.levels.ERROR)
-        return
-      end
+    local ok, err = persist_scope_state(scope.scope_root, scope.data)
+    if not ok then
+      vim.notify(err or "Failed to clear review comments.", vim.log.levels.ERROR)
+      return
     end
   end
 
