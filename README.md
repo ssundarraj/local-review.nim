@@ -6,9 +6,7 @@
 
 There are already great Neovim tools for exploring diffs and reviewing changes — use Diffview, Neogit, CodeReview, or simply your normal buffers. `local-review.nvim` is designed to complement them by doing one small thing well: **adding inline review comments to your existing workflow.**
 
-Leave comments directly on your code while you review it. Keep them local, export them as structured feedback for a coding agent, or submit them directly as a GitHub PR review.
-
-It works the other way too: pull existing GitHub PR review comments into Neovim and see them alongside your own local feedback.
+Leave comments directly on your code while you review it. Keep them local or export them as structured feedback for a coding agent.
 
 The idea is simple:
 
@@ -23,10 +21,9 @@ Diffview / Neogit / CodeReview / normal buffers
                          ▼
                  local-review.nvim
                       comments
-                    ╱    │    ╲
-                   ╱     │     ╲
-              local   AI agent   GitHub
-                              review
+                       ╱    ╲
+                      ╱      ╲
+                  local    AI agent
 ```
 
 Use the tools you already like for navigating and understanding changes. `local-review.nvim` provides the small, composable layer between **reviewing the code** and **doing something with your feedback**.
