@@ -237,7 +237,8 @@ local function find_current_comment()
   end
 
   local line = current_line()
-  local comment, index = find_comment_entry_at_line(resolved.scope_state.data.comments, resolved.ctx.absolute_path, line)
+  local comment, index =
+    find_comment_entry_at_line(resolved.scope_state.data.comments, resolved.ctx.absolute_path, line)
   return {
     ---@type LocalReviewComment?
     comment = comment,
@@ -253,7 +254,8 @@ local function find_line_comment(bufnr, line)
     return nil, err
   end
 
-  local comment, index = find_comment_entry_at_line(resolved.scope_state.data.comments, resolved.ctx.absolute_path, line)
+  local comment, index =
+    find_comment_entry_at_line(resolved.scope_state.data.comments, resolved.ctx.absolute_path, line)
   return {
     ---@type LocalReviewComment?
     comment = comment,

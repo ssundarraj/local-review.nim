@@ -52,15 +52,17 @@ storage.save_scope(scope_root, data)
 local b_path = vim.fn.tempname() .. "_instance_b.lua"
 vim.fn.writefile(vim.split(b_script, "\n"), b_path)
 
-local result = vim.system({
-  "nvim",
-  "--headless",
-  "--clean",
-  "-u",
-  "NONE",
-  "-l",
-  b_path,
-}):wait()
+local result = vim
+  .system({
+    "nvim",
+    "--headless",
+    "--clean",
+    "-u",
+    "NONE",
+    "-l",
+    b_path,
+  })
+  :wait()
 
 if result.code ~= 0 then
   error(string.format("Instance B failed: %s", result.stderr or "unknown error"))
