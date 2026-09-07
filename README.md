@@ -2,6 +2,8 @@
 
 ## Bring your own review workflow
 
+Neovim plugin for local code review, built for use with coding agents.
+
 **local-review.nvim doesn't try to reinvent code review.**
 
 There are already great Neovim tools for exploring diffs and reviewing changes — use Diffview, Neogit, CodeReview, or simply your normal buffers. `local-review.nvim` is designed to complement them by doing one small thing well: **adding inline review comments to your existing workflow.**
@@ -28,7 +30,6 @@ Diffview / Neogit / CodeReview / normal buffers
 
 Use the tools you already like for navigating and understanding changes. `local-review.nvim` provides the small, composable layer between **reviewing the code** and **doing something with your feedback**.
 
-Neovim plugin for local code review, built for use with coding agents.
 
 ## Features
 
